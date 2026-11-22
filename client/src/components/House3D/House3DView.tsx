@@ -114,7 +114,8 @@ export default function House3DView({ apps, balance, spirit, onBuy, onUpgrade }:
     };
     const load = async () => {
       try {
-        await ensureFbAuth();
+        const auth = await ensureFbAuth();
+        if (!auth) { fallback(); return; }
         const snap = await get(dbRef(rtDb, layoutPath));
         const val = snap.val();
         if (alive && val && typeof val === "object") setPositions({ ...defaultLayout(), ...(val as Layout) });
@@ -131,7 +132,7 @@ export default function House3DView({ apps, balance, spirit, onBuy, onUpgrade }:
     const t = setTimeout(() => {
       const fallbackApi = () => api("/appliances/layout", { method: "PUT", body: JSON.stringify({ layout: positions }) }).catch(() => {});
       ensureFbAuth()
-        .then(() => fbSet(dbRef(rtDb, layoutPath), positions))
+        .then((auth) => (auth ? fbSet(dbRef(rtDb, layoutPath), positions) : fallbackApi()))
         .catch(fallbackApi);
     }, 350);
     return () => clearTimeout(t);

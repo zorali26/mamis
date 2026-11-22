@@ -17,8 +17,14 @@ const app = initializeApp(firebaseConfig);
 export const rtDb = getDatabase(app);
 export const fbAuth = getAuth(app);
 
-/** RTDB rules require a signed-in user; anonymous auth is enough for layout saves. */
+/** RTDB rules require a signed-in user; anonymous auth is enough for layout saves.
+ *  If the project has anonymous sign-in disabled, stop retrying and use the API fallback. */
+let authUnavailable = false;
 export async function ensureFbAuth() {
-  if (!fbAuth.currentUser) await signInAnonymously(fbAuth);
+  if (authUnavailable) return null;
+  if (!fbAuth.currentUser) {
+    try { await signInAnonymously(fbAuth); }
+    catch { authUnavailable = true; return null; }
+  }
   return fbAuth.currentUser;
 }
