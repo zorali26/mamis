@@ -33,8 +33,11 @@ GitHub Pages **statik** sunar; Express API orada çalışmaz. Bu yüzden:
 - Repo **Settings → Pages → Source: GitHub Actions**
 - Repo **Settings → Variables → Actions** altına `VITE_API_URL` ekle:
   `https://mamis-api.onrender.com/api`
-- `main` branch'e push atınca `.github/workflows/deploy.yml` client'ı build edip Pages'e
-  yayınlar. Adres: `https://zorali26.github.io/mamis/#/`
+- GitHub web arayüzünden **Add file → Create new file** ile `.github/workflows/deploy.yml`
+  oluştur ve `docs/github-pages-workflow.yml` içeriğini yapıştır (commit et).
+  Not: mevcut OAuth token'da `workflow` scopes olmadığı için bu dosya otomatik push edilemiyor.
+- `main` branch'e push atınca workflow client'ı build edip Pages'e yayınlar.
+  Adres: `https://zorali26.github.io/mamis/#/`
 
 Client HashRouter kullanır, böylece sayfa yenileme/linkler Pages'te çalışır.
 `VITE_API_URL` boş olursa istekler `/api`'ye gider ve Pages'te çalışmaz — mutlaka set et.
