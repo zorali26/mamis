@@ -1,7 +1,9 @@
 import { memo, useRef } from "react";
 import { Color, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial, MeshStandardMaterialParameters, PointLight } from "three";
 import { useFrame } from "@react-three/fiber";
+import { Html } from "@react-three/drei";
 import { ITEM_SPECS, Layout, Pos } from "./layout";
+import { APPLIANCES } from "../../data/appliances";
 
 type V3 = [number, number, number];
 
@@ -59,19 +61,31 @@ export interface SceneProps {
   positions: Layout;
   onDragStart: (id: string) => void;
   moveMode: string | null;
+  levels: Record<string, number>;
 }
 
+const LABEL_Y: Record<string, number> = {
+  tv: 3.2, vacuum: 2.6, oven: 2.6, microwave: 2.2,
+  fridge: 4.0, washer: 2.5, dishwasher: 2.5, iron: 1.7, hairdryer: 1.8,
+};
+
 /** Scale a single appliance around its own spot; lift + pulse a ring while moving it. */
-function Place({ id, pos, active, children }: { id: string; pos: Pos; active: boolean; children: React.ReactNode }) {
+function Place({ id, pos, active, level, children }: { id: string; pos: Pos; active: boolean; level: number; children: React.ReactNode }) {
   const s = ITEM_SPECS[id].scale;
   const ref = useRef<Group>(null);
+  const orb = useRef<Mesh>(null);
   const mat = useRef<MeshBasicMaterial>(null);
   const lift = useRef(0);
   const r = Math.max(ITEM_SPECS[id].w, ITEM_SPECS[id].d) / 2;
+  const name = APPLIANCES.find((a) => a.id === id)?.name || id;
   useFrame((state) => {
     lift.current += ((active ? 0.45 : 0) - lift.current) * 0.18;
     if (ref.current) ref.current.position.y = lift.current;
     if (mat.current) mat.current.opacity = active ? 0.3 + 0.22 * Math.sin(state.clock.elapsedTime * 4) : 0;
+    if (orb.current) {
+      orb.current.rotation.y += 0.03;
+      orb.current.position.y = LABEL_Y[id] - 0.45 + Math.sin(state.clock.elapsedTime * 2) * 0.08;
+    }
   });
   return (
     <group>
@@ -79,13 +93,35 @@ function Place({ id, pos, active, children }: { id: string; pos: Pos; active: bo
         <ringGeometry args={[r, r + 0.14, 32]} />
         <meshBasicMaterial ref={mat} color="#22d3ee" transparent opacity={0} depthWrite={false} side={2} />
       </mesh>
+      {/* level 2+: glowing base ring; level 3: floating golden orb */}
+      {level >= 2 && (
+        <mesh position={[pos.x, 0.06, pos.z]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[r - 0.12, r - 0.02, 32]} />
+          <meshBasicMaterial color={level >= 3 ? "#fbbf24" : "#22d3ee"} transparent opacity={0.65} side={2} />
+        </mesh>
+      )}
+      {level >= 3 && (
+        <mesh ref={orb} position={[pos.x, LABEL_Y[id] - 0.45, pos.z]}>
+          <sphereGeometry args={[0.16, 10, 8]} />
+          <meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={0.9} />
+        </mesh>
+      )}
+      {level > 0 && (
+        <Html position={[pos.x, LABEL_Y[id], pos.z]} center distanceFactor={20} zIndexRange={[8, 0]} style={{ pointerEvents: "none" }}>
+          <div className="house-label">
+            <span className="house-label-name">{name}</span>
+            <span className="house-label-level">Lv {level}</span>
+          </div>
+        </Html>
+      )}
       <group ref={ref} position={[pos.x * (1 - s), 0, pos.z * (1 - s)]} scale={s}>{children}</group>
     </group>
   );
 }
 
-export default function HouseScene({ onSelect, ownedIds, positions, onDragStart, moveMode }: SceneProps) {
+export default function HouseScene({ onSelect, ownedIds, positions, onDragStart, moveMode, levels }: SceneProps) {
   const owns = (id: string) => ownedIds.has(id);
+  const lv = (id: string) => levels[id] || 0;
   const p = (id: string) => positions[id] || { x: ITEM_SPECS[id].x, z: ITEM_SPECS[id].z };
   const common = (id: string) => ({
     dimmed: !owns(id),
@@ -105,15 +141,15 @@ export default function HouseScene({ onSelect, ownedIds, positions, onDragStart,
         </group>
       ))}
 
-      <Place id="tv" pos={p("tv")} active={moveMode === "tv"}><Television {...common("tv")} /></Place>
-      <Place id="vacuum" pos={p("vacuum")} active={moveMode === "vacuum"}><Vacuum {...common("vacuum")} /></Place>
-      <Place id="oven" pos={p("oven")} active={moveMode === "oven"}><Oven {...common("oven")} /></Place>
-      <Place id="microwave" pos={p("microwave")} active={moveMode === "microwave"}><Microwave {...common("microwave")} /></Place>
-      <Place id="fridge" pos={p("fridge")} active={moveMode === "fridge"}><Fridge {...common("fridge")} /></Place>
-      <Place id="washer" pos={p("washer")} active={moveMode === "washer"}><Washer {...common("washer")} /></Place>
-      <Place id="dishwasher" pos={p("dishwasher")} active={moveMode === "dishwasher"}><Dishwasher {...common("dishwasher")} /></Place>
-      <Place id="iron" pos={p("iron")} active={moveMode === "iron"}><Iron {...common("iron")} /></Place>
-      <Place id="hairdryer" pos={p("hairdryer")} active={moveMode === "hairdryer"}><Hairdryer {...common("hairdryer")} /></Place>
+      <Place id="tv" pos={p("tv")} active={moveMode === "tv"} level={lv("tv")}><Television {...common("tv")} /></Place>
+      <Place id="vacuum" pos={p("vacuum")} active={moveMode === "vacuum"} level={lv("vacuum")}><Vacuum {...common("vacuum")} /></Place>
+      <Place id="oven" pos={p("oven")} active={moveMode === "oven"} level={lv("oven")}><Oven {...common("oven")} /></Place>
+      <Place id="microwave" pos={p("microwave")} active={moveMode === "microwave"} level={lv("microwave")}><Microwave {...common("microwave")} /></Place>
+      <Place id="fridge" pos={p("fridge")} active={moveMode === "fridge"} level={lv("fridge")}><Fridge {...common("fridge")} /></Place>
+      <Place id="washer" pos={p("washer")} active={moveMode === "washer"} level={lv("washer")}><Washer {...common("washer")} /></Place>
+      <Place id="dishwasher" pos={p("dishwasher")} active={moveMode === "dishwasher"} level={lv("dishwasher")}><Dishwasher {...common("dishwasher")} /></Place>
+      <Place id="iron" pos={p("iron")} active={moveMode === "iron"} level={lv("iron")}><Iron {...common("iron")} /></Place>
+      <Place id="hairdryer" pos={p("hairdryer")} active={moveMode === "hairdryer"} level={lv("hairdryer")}><Hairdryer {...common("hairdryer")} /></Place>
 
       <ambientLight color="#fff4e2" intensity={0.9} />
       <directionalLight position={[11, 14, 7.5]} color="#fff6e6" intensity={1.35} castShadow />

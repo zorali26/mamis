@@ -14,6 +14,7 @@ export default function MarketsPage() {
   const { updateUser } = useAuth();
   const [stocks, setStocks] = useState<StockRow[]>([]);
   const [holdings, setHoldings] = useState<Record<string, number>>({});
+  const [pnl, setPnl] = useState<Record<string, number>>({});
   const [selected, setSelected] = useState<StockRow | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -23,8 +24,10 @@ export default function MarketsPage() {
       setStocks(r.stocks);
       const p = await api("/stocks/portfolio");
       const map: Record<string, number> = {};
-      p.holdings.forEach((h: any) => { map[h.stockId] = h.quantity; });
+      const pnlMap: Record<string, number> = {};
+      p.holdings.forEach((h: any) => { map[h.stockId] = h.quantity; pnlMap[h.stockId] = h.pnl; });
       setHoldings(map);
+      setPnl(pnlMap);
       updateUser({ balance: p.balance });
     } catch (e) {}
     setLoading(false);
@@ -57,6 +60,11 @@ export default function MarketsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold truncate">{s.name}</div>
                   <div className="text-xs text-slate-400">{holdings[s.id] ? holdings[s.id].toFixed(2) + " adet" : "Yok"}</div>
+                  {holdings[s.id] ? (
+                    <div className={"text-xs num " + ((pnl[s.id] || 0) >= 0 ? "text-up" : "text-down")}>
+                      K/Z: {pnl[s.id] >= 0 ? "+" : ""}{(pnl[s.id] || 0).toFixed(2)} MC
+                    </div>
+                  ) : null}
                 </div>
                 <div className="text-right">
                   <div className="font-bold num">{s.price.toFixed(2)}</div>

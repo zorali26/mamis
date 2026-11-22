@@ -8,6 +8,7 @@ import AssetsPage from "./pages/AssetsPage";
 import ProfilePage from "./pages/ProfilePage";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import SettingsPage from "./pages/SettingsPage";
+import AdminPage from "./pages/AdminPage";
 import Tutorial from "./components/Tutorial";
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="*" element={<Navigate to="/markets" replace />} />
         </Routes>
       </main>

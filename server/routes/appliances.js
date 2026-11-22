@@ -4,20 +4,20 @@ const { auth } = require("../middleware");
 const router = express.Router();
 
 const APPLIANCES = [
-  { id: "house", name: "Ev", baseCost: 400, baseIncome: 10, maxLevel: 3, spiritBase: 10 },
-  { id: "fridge", name: "Buzdolabı", baseCost: 500, baseIncome: 12, maxLevel: 3, spiritBase: 0 },
-  { id: "washer", name: "Çamaşır Makinesi", baseCost: 800, baseIncome: 20, maxLevel: 3, spiritBase: 0 },
-  { id: "dishwasher", name: "Bulaşık Makinesi", baseCost: 600, baseIncome: 15, maxLevel: 3, spiritBase: 0 },
-  { id: "tv", name: "Televizyon", baseCost: 400, baseIncome: 8, maxLevel: 3, spiritBase: 0 },
-  { id: "ac", name: "Klima", baseCost: 1200, baseIncome: 30, maxLevel: 3, spiritBase: 0 },
-  { id: "microwave", name: "Mikrodalga", baseCost: 300, baseIncome: 6, maxLevel: 3, spiritBase: 0 },
-  { id: "oven", name: "Fırın", baseCost: 700, baseIncome: 16, maxLevel: 3, spiritBase: 0 },
-  { id: "vacuum", name: "Elektrik Süpürgesi", baseCost: 350, baseIncome: 7, maxLevel: 3, spiritBase: 0 },
-  { id: "iron", name: "Ütü", baseCost: 250, baseIncome: 5, maxLevel: 3, spiritBase: 0 },
-  { id: "hairdryer", name: "Saç Kurutma Makinesi", baseCost: 200, baseIncome: 4, maxLevel: 3, spiritBase: 0 },
+  { id: "house", name: "Ev", baseCost: 400, baseIncome: 6, maxLevel: 3, spiritBase: 10 },
+  { id: "fridge", name: "Buzdolabı", baseCost: 500, baseIncome: 7, maxLevel: 3, spiritBase: 0 },
+  { id: "washer", name: "Çamaşır Makinesi", baseCost: 800, baseIncome: 12, maxLevel: 3, spiritBase: 0 },
+  { id: "dishwasher", name: "Bulaşık Makinesi", baseCost: 600, baseIncome: 9, maxLevel: 3, spiritBase: 0 },
+  { id: "tv", name: "Televizyon", baseCost: 400, baseIncome: 5, maxLevel: 3, spiritBase: 0 },
+  { id: "ac", name: "Klima", baseCost: 1200, baseIncome: 18, maxLevel: 3, spiritBase: 0 },
+  { id: "microwave", name: "Mikrodalga", baseCost: 300, baseIncome: 4, maxLevel: 3, spiritBase: 0 },
+  { id: "oven", name: "Fırın", baseCost: 700, baseIncome: 10, maxLevel: 3, spiritBase: 0 },
+  { id: "vacuum", name: "Elektrik Süpürgesi", baseCost: 350, baseIncome: 4, maxLevel: 3, spiritBase: 0 },
+  { id: "iron", name: "Ütü", baseCost: 250, baseIncome: 3, maxLevel: 3, spiritBase: 0 },
+  { id: "hairdryer", name: "Saç Kurutma Makinesi", baseCost: 200, baseIncome: 2, maxLevel: 3, spiritBase: 0 },
 ];
 
-function levelCost(base, level) { return Math.round(base * Math.pow(1.6, level)); }
+function levelCost(base, level) { return Math.round(base * Math.pow(1.8, level)); }
 function levelIncome(base, level) { return Math.round(base * Math.pow(1.5, level) * 10) / 10; }
 
 function ensureRows(userId) {

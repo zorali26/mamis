@@ -9,6 +9,7 @@ export interface User {
   spirit: number;
   tutorialDone: boolean;
   tutorialStep: number;
+  role?: string;
 }
 
 interface State {

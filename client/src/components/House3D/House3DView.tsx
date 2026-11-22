@@ -91,6 +91,7 @@ export default function House3DView({ apps, balance, spirit, onBuy, onUpgrade }:
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const ownedIds = useMemo(() => new Set(apps.filter((a) => a.owned).map((a) => a.id)), [apps]);
+  const levels = useMemo(() => Object.fromEntries(apps.map((a) => [a.id, a.level])), [apps]);
   const [positions, setPositions] = useState<Layout>(() => defaultLayout());
   const [loaded, setLoaded] = useState(false);
   const dragRef = useRef<string | null>(null);
@@ -209,7 +210,7 @@ export default function House3DView({ apps, balance, spirit, onBuy, onUpgrade }:
       >
         <CameraDriver controller={controller} />
         <ItemDragHandler dragRef={dragRef} positionsRef={positionsRef} onMove={onDragMove} onEnd={onDragEnd} />
-        <HouseScene onSelect={onSelectItem} ownedIds={ownedIds} positions={positions} onDragStart={onDragStart} moveMode={moveMode} />
+        <HouseScene onSelect={onSelectItem} ownedIds={ownedIds} positions={positions} onDragStart={onDragStart} moveMode={moveMode} levels={levels} />
       </Canvas>
 
       {/* loading animation */}

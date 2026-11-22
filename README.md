@@ -26,6 +26,13 @@ başlatır. Client `dist/` çıktısı statik olarak da sunulabilir (opsiyonel).
 Not: `node_modules`, `dist` ve `*.db` dosyaları repo'ya dahil değildir; veritabanı sunucu
 ilk açılışta otomatik oluşturulur.
 
+## Cüzdan ve admin
+
+- Kur: **50 MC = 1 TL**. Minimum yatırım 20 TL, minimum çekim 50 TL.
+- Admin yetkisi vermek için: `npm run admin -- kullanci@email.com` (server klasöründe).
+- Admin paneli `/admin` adresinde; borsa fiyatı/volatilite/aktiflik, zamanlı fiyat değişimi,
+  kullanıcı bakiyesi/rolü ve işlem geçmişi canlı olarak yönetilir.
+
 ## 3D ev
 
 - `client/src/components/House3D/` — sahne, kamera kontrolleri, yerleşim mantığı.

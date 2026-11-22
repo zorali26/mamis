@@ -13,4 +13,13 @@ function auth(req, res, next) {
   }
 }
 
-module.exports = { auth, JWT_SECRET };
+function adminOnly(req, res, next) {
+  let role = req.user.role;
+  if (role !== "admin") {
+    try { role = require("./db").prepare("SELECT role FROM users WHERE id = ?").get(req.user.id)?.role; } catch (e) {}
+  }
+  if (role !== "admin") return res.status(403).json({ error: "Admin yetkisi gerekli" });
+  next();
+}
+
+module.exports = { auth, adminOnly, JWT_SECRET };

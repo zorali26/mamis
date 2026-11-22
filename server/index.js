@@ -11,6 +11,8 @@ app.use(express.json());
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/stocks", require("./routes/stocks"));
 app.use("/api/appliances", require("./routes/appliances"));
+app.use("/api/wallet", require("./routes/wallet"));
+app.use("/api/admin", require("./routes/admin"));
 app.use("/api/leaderboard", require("./routes/leaderboard"));
 
 app.get("/api/health", (req, res) => res.json({ ok: true }));

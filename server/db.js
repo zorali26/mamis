@@ -42,6 +42,23 @@ db.exec(`
     PRIMARY KEY (user_id, appliance_id),
     FOREIGN KEY (user_id) REFERENCES users(id)
   );
+  CREATE TABLE IF NOT EXISTS wallet_tx (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    kind TEXT NOT NULL,
+    amount_mc REAL NOT NULL,
+    amount_tl REAL NOT NULL,
+    note TEXT,
+    created_at INTEGER NOT NULL
+  );
+  CREATE TABLE IF NOT EXISTS stock_schedule (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    stock_id TEXT NOT NULL,
+    target_price REAL NOT NULL,
+    apply_at INTEGER NOT NULL,
+    created_by INTEGER,
+    applied INTEGER NOT NULL DEFAULT 0
+  );
   CREATE TABLE IF NOT EXISTS predictions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
@@ -70,5 +87,6 @@ function addCol(table, col, def) {
 }
 addCol("users", "spirit", "INTEGER NOT NULL DEFAULT 0");
 addCol("users", "tutorial_step", "INTEGER NOT NULL DEFAULT 0");
+addCol("users", "role", "TEXT NOT NULL DEFAULT 'user'");
 // default balance for new users handled in code; ensure column default
 module.exports = db;

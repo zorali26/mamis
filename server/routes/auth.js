@@ -13,8 +13,8 @@ router.post("/register", (req, res) => {
   const now = Date.now();
   try {
     const info = db.prepare("INSERT INTO users (username, email, password_hash, balance, spirit, tutorial_done, tutorial_step, created_at, last_collect_at) VALUES (?,?,?,?,0,0,0,?,?)").run(username, email, hash, 500, now, now);
-    const user = { id: info.lastInsertRowid, username, email, balance: 500, spirit: 0, tutorialDone: false, tutorialStep: 0 };
-    const token = jwt.sign({ id: user.id, username }, JWT_SECRET, { expiresIn: "30d" });
+    const user = { id: info.lastInsertRowid, username, email, balance: 500, spirit: 0, tutorialDone: false, tutorialStep: 0, role: "user" };
+    const token = jwt.sign({ id: user.id, username, role: "user" }, JWT_SECRET, { expiresIn: "30d" });
     res.json({ token, user });
   } catch (e) {
     if (String(e).includes("UNIQUE")) return res.status(409).json({ error: "Kullanıcı veya e-posta zaten var" });
@@ -27,18 +27,18 @@ router.post("/login", (req, res) => {
   const u = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
   if (!u) return res.status(401).json({ error: "Geçersiz bilgiler" });
   if (!bcrypt.compareSync(password, u.password_hash)) return res.status(401).json({ error: "Geçersiz bilgiler" });
-  const user = { id: u.id, username: u.username, email: u.email, balance: u.balance, spirit: u.spirit, tutorialDone: !!u.tutorial_done, tutorialStep: u.tutorial_step };
-  const token = jwt.sign({ id: u.id, username: u.username }, JWT_SECRET, { expiresIn: "30d" });
+  const user = { id: u.id, username: u.username, email: u.email, balance: u.balance, spirit: u.spirit, tutorialDone: !!u.tutorial_done, tutorialStep: u.tutorial_step, role: u.role || "user" };
+  const token = jwt.sign({ id: u.id, username: u.username, role: user.role }, JWT_SECRET, { expiresIn: "30d" });
   res.json({ token, user });
 });
 
 router.get("/me", auth, (req, res) => {
   try { require("./appliances").collectIncome(req.user.id); } catch (e) {}
-  const u = db.prepare("SELECT id, username, email, balance, tutorial_done, tutorial_step FROM users WHERE id = ?").get(req.user.id);
+  const u = db.prepare("SELECT id, username, email, balance, role, tutorial_done, tutorial_step FROM users WHERE id = ?").get(req.user.id);
   if (!u) return res.status(404).json({ error: "Bulunamadı" });
   const spirit = require("./appliances").computeSpirit(req.user.id);
   db.prepare("UPDATE users SET spirit = ? WHERE id = ?").run(spirit, req.user.id);
-  res.json({ user: { id: u.id, username: u.username, email: u.email, balance: u.balance, spirit, tutorialDone: !!u.tutorial_done, tutorialStep: u.tutorial_step } });
+  res.json({ user: { id: u.id, username: u.username, email: u.email, balance: u.balance, spirit, tutorialDone: !!u.tutorial_done, tutorialStep: u.tutorial_step, role: u.role || "user" } });
 });
 
 router.put("/tutorial", auth, (req, res) => {
