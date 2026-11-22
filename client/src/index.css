@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+html, body, #root { height: 100%; }
+body { margin: 0; overscroll-behavior: none; }
+
+* { -webkit-tap-highlight-color: transparent; }
+
+/* smooth number transitions */
+.num { font-variant-numeric: tabular-nums; }
+
+/* card hover */
+.card { transition: transform 0.15s ease, box-shadow 0.15s ease; will-change: transform; }
+.card:hover { transform: translateY(-2px); }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #2a3550; border-radius: 3px; }
+
+/* animations */
+@keyframes pop { 0%{transform:scale(0.9);opacity:0} 100%{transform:scale(1);opacity:1} }
+.pop { animation: pop 0.18s ease-out; }
+@keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+.shimmer { background: linear-gradient(90deg,#1a2236 25%,#24304d 50%,#1a2236 75%); background-size:200% 100%; animation: shimmer 1.4s infinite; }
+
+/* --- house scene --- */
+.room-enter { animation: roomIn 0.6s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes roomIn { from { opacity: 0; transform: translateY(14px) scale(0.97); } to { opacity: 1; transform: none; } }
+
+.shadow-breathe { animation: shadowB 4s ease-in-out infinite; transform-origin: 320px 455px; }
+@keyframes shadowB { 0%,100% { opacity: .45; transform: scaleX(1); } 50% { opacity: .35; transform: scaleX(.96); } }
+
+.lamp-glow { animation: lamp 5s ease-in-out infinite; transform-origin: 320px 235px; }
+@keyframes lamp { 0%,100% { opacity: .8; } 50% { opacity: 1; } }
+
+.twinkle { animation: tw 2.4s ease-in-out infinite; }
+.twinkle2 { animation: tw 3.1s ease-in-out infinite .7s; }
+@keyframes tw { 0%,100% { opacity: .3; } 50% { opacity: 1; } }
+
+.house-item { transform-box: fill-box; transform-origin: center bottom; transition: transform .22s cubic-bezier(.2,.8,.2,1), filter .22s; }
+.house-item:hover, .house-item.active { transform: translateY(-7px) scale(1.06); }
+.house-item.owned { filter: drop-shadow(0 0 7px rgba(34,211,238,.45)); animation: ownedPulse 3s ease-in-out infinite; }
+@keyframes ownedPulse { 0%,100% { filter: drop-shadow(0 0 6px rgba(34,211,238,.35)); } 50% { filter: drop-shadow(0 0 12px rgba(34,211,238,.6)); } }
+.badge-pop { animation: badgePop .35s cubic-bezier(.34,1.56,.64,1) both; }
+@keyframes badgePop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* --- house 3d --- */
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #2a3550;
+  border-top-color: #22d3ee;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* modal info bar (matches old 2d style) */
+.info-bar {
+  background: #0d1424;
+  border: 1px solid #334259;
+  border-radius: 10px;
+  padding: 6px 10px;
+}
