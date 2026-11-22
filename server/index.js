@@ -17,5 +17,17 @@ app.use("/api/leaderboard", require("./routes/leaderboard"));
 
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 
+// when built, serve the client from the same service (single Render Web Service option)
+const path = require("path");
+const fs = require("fs");
+const dist = path.join(__dirname, "..", "client", "dist");
+if (fs.existsSync(dist)) {
+  app.use(express.static(dist));
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api")) return next();
+    res.sendFile(path.join(dist, "index.html"));
+  });
+}
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log("Mamis server on", PORT));
